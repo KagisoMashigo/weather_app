@@ -1,6 +1,6 @@
 import 'weather_api_client.dart';
 
-void main(List<String> arguments) {
+void main(List<String> arguments) async {
   if (arguments.length != 1) {
     print('Syntax: dart bin/main.dart <city>');
     return;
@@ -8,5 +8,8 @@ void main(List<String> arguments) {
   final city = arguments.first;
   // print(city);
   final api = WeatherApiClient();
-  api.getLocationId(city);
+  final locationId = await api.getLocationId(city);
+  // print(locationId);
+  final weather = await api.getWeather(city);
+  print(weather);
 }

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import 'weather.dart';
+
 class WeatherApiClient {
   static const baseUrl = 'https://www.metaweather.com/api';
 
@@ -11,7 +13,23 @@ class WeatherApiClient {
     if (locationResponse.statusCode != 200) {
       throw Exception('Failed to locate ID for city: $city');
     }
-    final locationJson = jsonDecode(locationResponse.body);
-    
+    final locationJson = jsonDecode(locationResponse.body) as List;
+    return (locationJson.first['woeid']) as int;
+  }
+
+  Future<Weather> fetchWeather(int locationId) async {
+    final weather = Uri.parse('$baseUrl/location/$locationId');
+    final weatherResponse = await http.get(weather);
+    if (weatherResponse.statusCode != 200) {
+      throw Exception('Failed to locate ID for city: $locationId');
+    }
+    final weatherJson = jsonDecode(weatherResponse.body);
+    final consolidatedWeather = weatherJson['consolidated_weather'] as List;
+    return Weather.fromJson(consolidatedWeather[0]);
+  }
+
+  Future<Weather> getWeather(String city) async {
+    final locationId = await getLocationId(city);
+    return fetchWeather(locationId);
   }
 }
