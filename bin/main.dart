@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'weather_api_client.dart';
 
 void main(List<String> arguments) async {
@@ -6,10 +8,15 @@ void main(List<String> arguments) async {
     return;
   }
   final city = arguments.first;
-  // print(city);
   final api = WeatherApiClient();
-  final locationId = await api.getLocationId(city);
-  // print(locationId);
-  final weather = await api.getWeather(city);
-  print(weather);
+  try {
+    final weather = await api.getWeather(city);
+    print(weather);
+  } on WeatherException catch (e) {
+    print(e.message);
+  } on SocketException catch (_) {
+    print('Could not connect to network');
+  } catch (e) {
+    print(e);
+  }
 }
